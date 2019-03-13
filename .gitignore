@@ -1,0 +1,5 @@
+# Ignore all the modules since required dependencies are in package.json
+node_modules/*
+
+# Hide secrets
+auth.json
