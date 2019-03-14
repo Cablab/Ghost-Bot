@@ -95,7 +95,7 @@ var RebuildManifestDB = function (manifestPath, jsonManifest)
         });
 
         // Update the path table with the most current Manifest URL path
-        let insertPath = "update path set latest = \'" + manifestPath + "\'";
+        let insertPath = "UPDATE path SET latest = \'" + manifestPath + "\'";
         connection.query(insertPath);
 
         for (let definition in jsonManifest) 
@@ -103,11 +103,11 @@ var RebuildManifestDB = function (manifestPath, jsonManifest)
             // Create a table corresponding to the name of each top-level group
             // if it doesn't already exist
             let table = definition.toString();
-            let createTable = "create table if not exists " + table + " (hash BIGINT NOT NULL UNIQUE, value JSON, PRIMARY KEY(hash))";
+            let createTable = "CREATE TABLE IF NOT EXISTS " + table + " (hash BIGINT NOT NULL UNIQUE, value JSON, PRIMARY KEY(hash))";
             connection.query(createTable);
 
             // Delete any existing data in that table if that table already exists
-            let deleteTableData = "delete from " + table;
+            let deleteTableData = "DELETE FROM " + table;
             connection.query(deleteTableData);
 
             for (let hash in jsonManifest[table]) 
@@ -118,7 +118,7 @@ var RebuildManifestDB = function (manifestPath, jsonManifest)
                 let replacedJson = mysql_real_escape_string(jsonValue);
 
                 // Insert each JSON object into its corresponding top-level table
-                let addTableData = "insert into " + table + "(hash, value) values (" 
+                let addTableData = "INSERT INTO " + table + "(hash, value) VALUES (" 
                                     + hash + ", \'" + replacedJson + "\')"; 
 
                 var errorCount = 1;
