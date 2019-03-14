@@ -1,5 +1,8 @@
 # Ignore all the modules since required dependencies are in package.json
 node_modules/*
 
+# Ignore small files that run tests
+tests/*
+
 # Hide secrets
 auth.json
