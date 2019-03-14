@@ -121,9 +121,16 @@ var RebuildManifestDB = function (manifestPath, jsonManifest)
                 let addTableData = "insert into " + table + "(hash, value) values (" 
                                     + hash + ", \'" + replacedJson + "\')"; 
 
+                var errorCount = 1;
                 connection.query(addTableData, function (error) 
                 {
-                    if (error) { console.log(addTableData); }
+                    if (error) 
+                    { 
+                        console.log(error); 
+                        console.log("Query: " + addTableData);
+                        console.log("Error #" + errorCount + "\n");
+                        errorCount += 1;
+                    }
                 });
             }
         }
@@ -197,7 +204,7 @@ module.exports =
 // with escpaed special characters
 function mysql_real_escape_string(str) 
 {
-    return str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function (char) {
+    return str.replace(/[\0\x08\x09\x1a\n\r"'\\]/g, function (char) {
         switch (char) {
             case "\0":
                 return "\\0";
