@@ -1,7 +1,9 @@
+// Dependencies
 var request = require("request");
 var auth = require("./auth.json");
 var mysql = require("mysql2");
 
+// Global variables
 const ROOT_PATH = "https://www.bungie.net/Platform";
 const BASE_URL = "https://www.bungie.net"
 
@@ -14,6 +16,7 @@ var requestHeader =
     }
 };
 
+// Create the mysql connection object
 var connection = mysql.createConnection({
     host: auth.host,
     user: auth.user,
@@ -22,21 +25,8 @@ var connection = mysql.createConnection({
     port: auth.port
 });
 
-// SIMPLE CONNECTION TEST
-// connection.connect(function(err) {
-//     if (err) { console.log(err.toString()); }
-//     else { console.log("Connected!"); }
-// });
-
-// connection.query("SELECT * FROM path", function(error, results, fields) {
-//     if (error) console.log(error.toString());
-//     else (console.log(results[0].latest));
-// });
-
-// connection.end();
-
-
-
+// Queries the Destiny 2 API to find the URL path for the 
+// English JSON Manifest
 var FindManifestPath = function () 
 {
     return new Promise((resolve, reject) => 
@@ -63,6 +53,8 @@ var FindManifestPath = function ()
     });
 };
 
+// Finds and returns the entire Destiny 2 English
+// JSON Manifest and returns it as a single JSON object
 var FindJsonManifest = function (path) 
 {
     return new Promise((resolve, reject) => 
@@ -84,6 +76,15 @@ var FindJsonManifest = function (path)
     });
 };
 
+// Parses the Destiny 2 English JSON Manifest and places the 
+// data into a MySQL database. A table is created for each
+// top-level Definition group in the Manifest, then each
+// object in a given group is added into that table as a record
+// using the object's hash value as a key and the JSON contents
+// as the 'value' field.
+//
+// In addition, a table is made to store the current Manifest
+// URL path. This is used to check when to update the database.
 var RebuildManifestDB = function (manifestPath, jsonManifest) 
 {
     return new Promise((resolve, reject) => 
@@ -93,23 +94,30 @@ var RebuildManifestDB = function (manifestPath, jsonManifest)
             if (err) { reject("Connection to database failed"); }
         });
 
+        // Update the path table with the most current Manifest URL path
         let insertPath = "update path set latest = \'" + manifestPath + "\'";
         connection.query(insertPath);
 
         for (let definition in jsonManifest) 
         {
+            // Create a table corresponding to the name of each top-level group
+            // if it doesn't already exist
             let table = definition.toString();
             let createTable = "create table if not exists " + table + " (hash BIGINT NOT NULL UNIQUE, value JSON, PRIMARY KEY(hash))";
             connection.query(createTable);
 
+            // Delete any existing data in that table if that table already exists
             let deleteTableData = "delete from " + table;
             connection.query(deleteTableData);
 
             for (let hash in jsonManifest[table]) 
             {
+                // Stringify each JSON object inside the top-level group and
+                // escape any special characters
                 let jsonValue = JSON.stringify(jsonManifest[table][hash]);
                 let replacedJson = mysql_real_escape_string(jsonValue);
 
+                // Insert each JSON object into its corresponding top-level table
                 let addTableData = "insert into " + table + "(hash, value) values (" 
                                     + hash + ", \'" + replacedJson + "\')"; 
 
@@ -123,7 +131,11 @@ var RebuildManifestDB = function (manifestPath, jsonManifest)
     });
 };
 
-var CheckManifestVersion = function () {
+// Returns the Destiny 2 English JSON Manifest path
+// that is stored in the database, or, if no path
+// is currently stored, returns a string that will not
+// match any live URL path
+var FindManifestVersion = function () {
     return new Promise((resolve, reject) => 
     {
         connection.connect(function (err) 
@@ -135,16 +147,20 @@ var CheckManifestVersion = function () {
         let response = connection.promise().query(pathQuery,
             function (err, results, fields)
         {
+            // Instead of rejecting if there is an error, resolve
+            // with a string that will not match a live URL path
             if (err) { resolve("Error finding latest path."); }
             else { resolve(results[0]["latest"]); }
         });
     });
 }
 
+// Asynchronous driver method that uses the above functions
+// to maintain the Destiny 2 JSON Manifest Database
 var GetManifest = async function () 
 {
     let currentPath = await FindManifestPath();
-    let oldPath = await CheckManifestVersion();
+    let oldPath = await FindManifestVersion();
 
     if (oldPath.toString() === currentPath.toString()) 
     {
@@ -158,7 +174,7 @@ var GetManifest = async function ()
     }
 };
 
-
+// Update the database
 GetManifest().then(results => {
     console.log(results);
 }).catch(message => {
@@ -168,6 +184,17 @@ GetManifest().then(results => {
     console.log("Finished rebuilding manifest database");
 });
 
+// Export the usable GetManifest driver function
+module.exports = 
+{
+    GetManifest
+}
+
+
+/* Helper methods */
+
+// Takes a string as input and returns the same string
+// with escpaed special characters
 function mysql_real_escape_string(str) 
 {
     return str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function (char) {
@@ -188,52 +215,8 @@ function mysql_real_escape_string(str)
             case "'":
             case "\\":
             case "%":
-                return "\\" + char; // prepends a backslash to backslash, percent,
-            // and double/single quotes
+                // prepends a backslash to backslash, percent, and double/single quotes
+                return "\\" + char; 
         }
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-// async function CreateManifestDB(jsonManifest)
-// {
-
-//     let connected = await ConnectToManifestDB();
-//     if (!connected)
-//     {
-//         return "Connection failed.";
-//     }
-
-//     for (let table in jsonManifest)
-//     {
-//         console.log(table);
-//     }
-
-
-//     connection.end();
-// }
-
-
-// function ConnectToManifestDB()
-// {
-//     connection.connect(function(err) {
-//         if (err) 
-//         { 
-//             console.log(err.toString());
-//             return false;
-//         }
-//         else 
-//         { 
-//             return true;
-//         }
-//     });
-// }
