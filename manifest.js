@@ -84,7 +84,7 @@ var FindJsonManifest = function (path)
     });
 };
 
-var RebuildManifestDB = function (jsonManifest) 
+var RebuildManifestDB = function (manifestPath, jsonManifest) 
 {
     return new Promise((resolve, reject) => 
     {
@@ -92,6 +92,9 @@ var RebuildManifestDB = function (jsonManifest)
         {
             if (err) { reject("Connection to database failed"); }
         });
+
+        let insertPath = "update path set latest = \'" + manifestPath + "\'";
+        connection.query(insertPath);
 
         for (let definition in jsonManifest) 
         {
@@ -115,23 +118,44 @@ var RebuildManifestDB = function (jsonManifest)
                     if (error) { console.log(addTableData); }
                 });
             }
-
-            // console.log(jsonManifest["DestinySandboxPerkDefinition"]);
-
-            // console.log("\"" + table + "\"");
-            // console.log(table);
         }
-        resolve("Database built");
+        resolve("Rebuilding manifest database...");
     });
 };
 
+var CheckManifestVersion = function () {
+    return new Promise((resolve, reject) => 
+    {
+        connection.connect(function (err) 
+        {
+            if (err) { reject("Connection to database failed."); }
+        })
+
+        let pathQuery = "SELECT latest FROM path";
+        let response = connection.promise().query(pathQuery,
+            function (err, results, fields)
+        {
+            if (err) { resolve("Error finding latest path."); }
+            else { resolve(results[0]["latest"]); }
+        });
+    });
+}
+
 var GetManifest = async function () 
 {
-    let path = await FindManifestPath();
-    let manifest = await FindJsonManifest(path);
-    let built = await RebuildManifestDB(manifest);
+    let currentPath = await FindManifestPath();
+    let oldPath = await CheckManifestVersion();
 
-    return built;
+    if (oldPath.toString() === currentPath.toString()) 
+    {
+        return "Manifest is up to date.";
+    }
+    else 
+    {
+        let manifest = await FindJsonManifest(currentPath);
+        let built = await RebuildManifestDB(currentPath, manifest);
+        return built;
+    }
 };
 
 
@@ -141,6 +165,7 @@ GetManifest().then(results => {
     console.log(message.toString());
 }).finally(() => {
     connection.end();
+    console.log("Finished rebuilding manifest database");
 });
 
 function mysql_real_escape_string(str) 
