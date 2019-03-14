@@ -76,10 +76,10 @@ var FindJsonManifest = function (path)
                 let results = JSON.parse(body);
                 resolve(results);
             }
-            // else 
-            // {
-            //     reject("Failed to find manifest");
-            // }
+            else 
+            {
+                reject("Failed to find manifest");
+            }
         });
     });
 };
@@ -129,7 +129,7 @@ var CheckManifestVersion = function () {
         connection.connect(function (err) 
         {
             if (err) { reject("Connection to database failed."); }
-        })
+        });
 
         let pathQuery = "SELECT latest FROM path";
         let response = connection.promise().query(pathQuery,
@@ -148,7 +148,7 @@ var GetManifest = async function ()
 
     if (oldPath.toString() === currentPath.toString()) 
     {
-        return "Manifest is up to date.";
+        return "Manifest is up to date";
     }
     else 
     {
