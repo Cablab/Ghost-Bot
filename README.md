@@ -2,11 +2,11 @@
 A Discord Bot for my Destiny 2 clan's Discord server.
 
 ## Using manifest.js
-The Destiny 2 API apparently now has 2 different versions of their manifest. If you hit the standard https://www.bungie.net/Platform/Destiny2/Manifest/ path, the "mobileWorldContentPaths" object will give you path to hit (in the respective language) to download the manifest as a single sqlite3 file.
+The Destiny 2 API apparently now has 2 different versions of their manifest. If you hit the standard https://www.bungie.net/Platform/Destiny2/Manifest/ path, the "mobileWorldContentPaths" object will give you paths to hit (in the respective languages) to download the manifest as a single zip file (though its extention will be .content, it is a zip file). Other guides mention to unzip this file, then use the sqlite3 file inside (again, it'll be listed as .zip, but it is actually a .sqlite3 file after unzipping).
 
-There now also exists a "jsonWorldContentPaths" object that will give you paths to hit (in the respective language) to return the entire manifest as one single JSON object. 
+However, there now also exists a "jsonWorldContentPaths" object that will give you paths to hit (in the respective languages) to return the entire manifest as one single JSON object. 
 
-My manifest.js file uses the second method, grabs the english JSON manifest object, runs it through JSON.stringify(), runs it through a method that escapes certain characters, then puts the data into a MySQL database. The database has a table for each top-level Definition in the manifest, and each table has records relating the hash value of an entity to its entire JSON object value.
+My manifest.js file uses this second method, grabs the english JSON manifest object, runs it through JSON.stringify(), runs it through a method that escapes certain characters, then puts the data into a MySQL database. The database has a table for each top-level Definition in the manifest, and each table has records relating the hash value of an entity to its entire JSON object value.
 
 To use this file the way I have it set up, you **MUST**:
 - Have a local MySQL database setup
