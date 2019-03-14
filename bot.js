@@ -51,58 +51,51 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     // !hours psn [displayName]
                     case 'psn':
                         apiCalls.GetCharactersWithDisplayNames("TigerPsn", args[2]).then((characters) => {
-                            if (characters !== INVALID_GUARDIAN) {
-                                bot.sendMessage({
-                                    to: channelID,
-                                    message: apiCalls.PrintDetailedHours(characters)
-                                });
-                            }
-                            else {
-                                bot.sendMessage({
-                                    to: channelID,
-                                    message: INVALID_GUARDIAN
-                                });
-                            }
+                            bot.sendMessage({
+                                to: channelID,
+                                message: apiCalls.PrintDetailedHours(characters)
+                            });
+                        }).catch(() => {
+                            bot.sendMessage({
+                                to: channelID,
+                                message: INVALID_GUARDIAN
+                            });
                         });
                     break;
 
                     // !hours pc [displayName#XXXX]
                     case 'pc':
                         apiCalls.GetCharactersWithDisplayNames("TigerBlizzard", encodeURIComponent(args[2])).then((characters) => {
-                            if (characters !== INVALID_GUARDIAN) {
-                                bot.sendMessage({
-                                    to: channelID,
-                                    message: apiCalls.PrintDetailedHours(characters)
-                                });
-                            }
-                            else {
-                                bot.sendMessage({
-                                    to: channelID,
-                                    message: INVALID_GUARDIAN
-                                });
-                            }
+                            bot.sendMessage({
+                                to: channelID,
+                                message: apiCalls.PrintDetailedHours(characters)
+                            });
+                        }).catch(() => {
+                            bot.sendMessage({
+                                to: channelID,
+                                message: INVALID_GUARDIAN
+                            });
                         });
                     break;
 
                     // !hours xbox [displayName]
                     case 'xbox':
                         apiCalls.GetCharactersWithDisplayNames("TigerXbox", args[2]).then((characters) => {
-                            if (characters !== INVALID_GUARDIAN) {
-                                bot.sendMessage({
-                                    to: channelID,
-                                    message: apiCalls.PrintDetailedHours(characters)
-                                });
-                            }
-                            else {
-                                bot.sendMessage({
-                                    to: channelID,
-                                    message: INVALID_GUARDIAN
-                                });
-                            }
+                            bot.sendMessage({
+                                to: channelID,
+                                message: apiCalls.PrintDetailedHours(characters)
+                            });
+                        }).catch(() => {
+                            bot.sendMessage({
+                                to: channelID,
+                                message: INVALID_GUARDIAN
+                            });
                         });
                     break;
                 }
             break;
+
+            // Any new commands go here
         }
     }
 });
