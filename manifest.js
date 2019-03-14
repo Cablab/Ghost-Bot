@@ -22,6 +22,7 @@ var connection = mysql.createConnection({
     port: auth.port
 });
 
+// SIMPLE CONNECTION TEST
 // connection.connect(function(err) {
 //     if (err) { console.log(err.toString()); }
 //     else { console.log("Connected!"); }
@@ -36,20 +37,25 @@ var connection = mysql.createConnection({
 
 
 
-var FindManifestPath = function () {
-    return new Promise((resolve, reject) => {
+var FindManifestPath = function () 
+{
+    return new Promise((resolve, reject) => 
+    {
         requestHeader["url"] = ROOT_PATH + "/Destiny2/Manifest/";
 
-        request(requestHeader, function (error, response, body) {
-            if (!error && response.statusCode == 200) {
+        request(requestHeader, function (error, response, body) 
+        {
+            if (!error && response.statusCode == 200) 
+            {
                 let results = JSON.parse(body);
 
-                if (results["Response"] === undefined) {
-                    reject("FindManifest rejected the Promise");
+                if (results["Response"] === undefined) 
+                {
+                    reject("FindManifestPath rejected the Promise");
                 }
-                else {
-                    //resolve(results);
-                    //resolve(results["Response"]["mobileWorldContentPaths"]["en"]);
+                else 
+                {
+                    //resolve(results["Response"]["mobileWorldContentPaths"]["en"]); // The zipped sqlite3 version of the english manifest
                     resolve(results["Response"]["jsonWorldContentPaths"]["en"]);
                 }
             }
@@ -57,28 +63,38 @@ var FindManifestPath = function () {
     });
 };
 
-var FindManifest = function (path) {
-    return new Promise((resolve, reject) => {
+var FindJsonManifest = function (path) 
+{
+    return new Promise((resolve, reject) => 
+    {
         requestHeader["url"] = BASE_URL + path;
 
-        request(requestHeader, function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                //resolve(body);
+        request(requestHeader, function (error, response, body) 
+        {
+            if (!error && response.statusCode == 200) 
+            {
                 let results = JSON.parse(body);
-
                 resolve(results);
             }
+            // else 
+            // {
+            //     reject("Failed to find manifest");
+            // }
         });
     });
 };
 
-var RebuildManifestDB = function (jsonManifest) {
-    return new Promise((resolve, reject) => {
-        connection.connect(function (err) {
+var RebuildManifestDB = function (jsonManifest) 
+{
+    return new Promise((resolve, reject) => 
+    {
+        connection.connect(function (err) 
+        {
             if (err) { reject("Connection to database failed"); }
         });
 
-        for (let definition in jsonManifest) {
+        for (let definition in jsonManifest) 
+        {
             let table = definition.toString();
             let createTable = "create table if not exists " + table + " (hash BIGINT NOT NULL UNIQUE, value JSON, PRIMARY KEY(hash))";
             connection.query(createTable);
@@ -86,13 +102,16 @@ var RebuildManifestDB = function (jsonManifest) {
             let deleteTableData = "delete from " + table;
             connection.query(deleteTableData);
 
-            for (let hash in jsonManifest[table]) {
+            for (let hash in jsonManifest[table]) 
+            {
                 let jsonValue = JSON.stringify(jsonManifest[table][hash]);
                 let replacedJson = mysql_real_escape_string(jsonValue);
 
                 let addTableData = "insert into " + table + "(hash, value) values (" 
                                     + hash + ", \'" + replacedJson + "\')"; 
-                connection.query(addTableData, function (error) {
+
+                connection.query(addTableData, function (error) 
+                {
                     if (error) { console.log(addTableData); }
                 });
             }
@@ -106,9 +125,10 @@ var RebuildManifestDB = function (jsonManifest) {
     });
 };
 
-var GetManifest = async function () {
+var GetManifest = async function () 
+{
     let path = await FindManifestPath();
-    let manifest = await FindManifest(path);
+    let manifest = await FindJsonManifest(path);
     let built = await RebuildManifestDB(manifest);
 
     return built;
@@ -123,7 +143,8 @@ GetManifest().then(results => {
     connection.end();
 });
 
-function mysql_real_escape_string(str) {
+function mysql_real_escape_string(str) 
+{
     return str.replace(/[\0\x08\x09\x1a\n\r'\\\%]/g, function (char) {
         switch (char) {
             case "\0":
