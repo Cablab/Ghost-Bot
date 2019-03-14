@@ -145,7 +145,7 @@ GetManifest().then(results => {
 
 function mysql_real_escape_string(str) 
 {
-    return str.replace(/[\0\x08\x09\x1a\n\r'\\\%]/g, function (char) {
+    return str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function (char) {
         switch (char) {
             case "\0":
                 return "\\0";
