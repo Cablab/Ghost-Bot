@@ -17,7 +17,8 @@ var requestHeader =
 };
 
 // Create the mysql connection object
-var connection = mysql.createConnection({
+var connection = mysql.createConnection(
+{
     host: auth.host,
     user: auth.user,
     password: auth.password,
@@ -91,7 +92,10 @@ var RebuildManifestDB = function (manifestPath, jsonManifest)
     {
         connection.connect(function (err) 
         {
-            if (err) { reject("Connection to database failed"); }
+            if (err) 
+            { 
+                reject("Connection to database failed"); 
+            }
         });
 
         // Update the path table with the most current Manifest URL path
@@ -142,7 +146,8 @@ var RebuildManifestDB = function (manifestPath, jsonManifest)
 // that is stored in the database, or, if no path
 // is currently stored, returns a string that will not
 // match any live URL path
-var FindManifestVersion = function () {
+var FindManifestVersion = function () 
+{
     return new Promise((resolve, reject) => 
     {
         connection.connect(function (err) 
