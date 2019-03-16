@@ -96,6 +96,19 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 }
             break;
 
+            case "twitch":
+                twitch.GetLatestVideo(args[1]).then(videoData => {
+                    bot.sendMessage({
+                        to: channelID,
+                        message: videoData["url"]
+                    })
+                }).catch(() => {
+                    bot.sendMessage({
+                        to: channelID,
+                        message: "Could not find that streamer"
+                    })
+                });
+            break;
             // Any new commands go here
         }
     }

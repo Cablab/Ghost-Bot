@@ -51,6 +51,11 @@ var FindLatestVideo = function (userID) {
 
 var GetLatestVideo = async function (username) {
     let userID = await FindUserID(username);
-    let videoURL = await FindLatestVideo(userID);
-    return videoURL;
+    let videoData = await FindLatestVideo(userID);
+    return videoData;
 };
+
+module.exports = 
+{
+    GetLatestVideo
+}
