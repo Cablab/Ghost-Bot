@@ -16,12 +16,21 @@ var FindUserID = function (username) {
         requestHeader["url"] = ROOT_PATH + "/helix/users?login=" + username;
 
         request(requestHeader, function (error, response, body) {
-            if (!error && response.statusCode == 200) {
+            if (!error && response.statusCode == 200) 
+            {
                 let results = JSON.parse(body);
-                resolve(results["data"][0]["id"]);
+
+                if (results["data"].length === 0)
+                {
+                    reject("Twitch user does not exist.");
+                }
+                else
+                {
+                    resolve(results["data"][0]["id"]);
+                }
             }
             else {
-                reject("HTTP request failed:\n" + error);
+                reject("HTTP FindUserID request failed:\n" + error);
             }
         });
     });
@@ -34,15 +43,18 @@ var FindLatestVideo = function (userID) {
         request(requestHeader, function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 let results = JSON.parse(body);
-                let data =
+
+                if (results["data"].length === 0)
                 {
-                    "title": results["data"][0]["title"],
-                    "url": results["data"][0]["url"]
+                    reject("Twitch user has no videos");
                 }
-                resolve(data);
+                else
+                {
+                    resolve(results["data"][0]["url"]);
+                }
             }
             else {
-                reject("HTTP request failed:\n" + error);
+                reject("HTTP FindLatestVideo request failed:\n" + error);
             }
         });
     });
@@ -51,8 +63,8 @@ var FindLatestVideo = function (userID) {
 
 var GetLatestVideo = async function (username) {
     let userID = await FindUserID(username);
-    let videoData = await FindLatestVideo(userID);
-    return videoData;
+    let url = await FindLatestVideo(userID);
+    return url;
 };
 
 module.exports = 

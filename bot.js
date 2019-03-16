@@ -56,10 +56,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 to: channelID,
                                 message: bungie.PrintDetailedHours(characters)
                             });
-                        }).catch(() => {
+                        }).catch((mess) => {
                             bot.sendMessage({
                                 to: channelID,
-                                message: INVALID_GUARDIAN
+                                message: mess
                             });
                         });
                     break;
@@ -97,15 +97,15 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             break;
 
             case "twitch":
-                twitch.GetLatestVideo(args[1]).then(videoData => {
+                twitch.GetLatestVideo(args[1]).then(url => {
                     bot.sendMessage({
                         to: channelID,
-                        message: videoData["url"]
+                        message: url
                     })
-                }).catch(() => {
+                }).catch((error) => {
                     bot.sendMessage({
                         to: channelID,
-                        message: "Could not find that streamer"
+                        message: error
                     })
                 });
             break;
