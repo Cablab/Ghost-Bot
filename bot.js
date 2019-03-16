@@ -1,7 +1,8 @@
 var Discord = require('discord.io');
 var logger = require('winston');
-var auth = require('./auth.json');
-var apiCalls = require('./apiCalls.js');
+const auth = require('./auth.json');
+const bungie = require('./apiCalls/bungie.js');
+const twitch = require('./apiCalls/twitch.js');
 
 const INVALID_GUARDIAN = "Could not find that Guardian";
 
@@ -50,10 +51,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 {
                     // !hours psn [displayName]
                     case 'psn':
-                        apiCalls.GetCharactersWithDisplayNames("TigerPsn", args[2]).then((characters) => {
+                        bungie.GetCharactersWithDisplayNames("TigerPsn", args[2]).then((characters) => {
                             bot.sendMessage({
                                 to: channelID,
-                                message: apiCalls.PrintDetailedHours(characters)
+                                message: bungie.PrintDetailedHours(characters)
                             });
                         }).catch(() => {
                             bot.sendMessage({
@@ -65,10 +66,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
                     // !hours pc [displayName#XXXX]
                     case 'pc':
-                        apiCalls.GetCharactersWithDisplayNames("TigerBlizzard", encodeURIComponent(args[2])).then((characters) => {
+                        bungie.GetCharactersWithDisplayNames("TigerBlizzard", encodeURIComponent(args[2])).then((characters) => {
                             bot.sendMessage({
                                 to: channelID,
-                                message: apiCalls.PrintDetailedHours(characters)
+                                message: bungie.PrintDetailedHours(characters)
                             });
                         }).catch(() => {
                             bot.sendMessage({
@@ -80,10 +81,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
                     // !hours xbox [displayName]
                     case 'xbox':
-                        apiCalls.GetCharactersWithDisplayNames("TigerXbox", args[2]).then((characters) => {
+                        bungie.GetCharactersWithDisplayNames("TigerXbox", args[2]).then((characters) => {
                             bot.sendMessage({
                                 to: channelID,
-                                message: apiCalls.PrintDetailedHours(characters)
+                                message: bungie.PrintDetailedHours(characters)
                             });
                         }).catch(() => {
                             bot.sendMessage({

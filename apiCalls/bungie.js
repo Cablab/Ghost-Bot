@@ -1,6 +1,6 @@
 /* Required List */
 var request = require("request");
-var auth = require('./auth.json');
+var auth = require('../auth.json');
 var mysql = require("mysql2");
 
 /* GLOBAL VARIABLE */
