@@ -2,7 +2,7 @@
 A Discord Bot for my Destiny 2 clan's Discord server.
 
 ## Using manifest.js
-The Destiny 2 API apparently now has 2 different versions of their manifest. If you hit the standard https://www.bungie.net/Platform/Destiny2/Manifest/ path, the "mobileWorldContentPaths" object will give you paths to hit (in the respective languages) to download the manifest as a single zip file (though its extention will be .content, it is a zip file). Other guides mention to unzip this file, then use the sqlite3 file inside (again, it'll be listed as .zip, but it is actually a .sqlite3 file after unzipping).
+The Destiny 2 API apparently now has 2 different versions of their manifest. If you hit the standard https://www.bungie.net/Platform/Destiny2/Manifest/ path, the "mobileWorldContentPaths" object will give you paths to hit (in the respective languages) to download the manifest as a single zip file (though its extention will be .content, it is a zip file). Other guides mention to unzip this file, then use the sqlite3 file inside (again, it'll be listed as .content, but it is actually a .sqlite3 file after unzipping).
 
 However, there now also exists a "jsonWorldContentPaths" object that will give you paths to hit (in the respective languages) to return the entire manifest as one single JSON object. 
 
