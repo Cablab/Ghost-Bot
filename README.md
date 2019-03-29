@@ -11,7 +11,7 @@ My manifest.js file uses this second method, grabs the english JSON manifest obj
 To use this file the way I have it set up, you **MUST**:
 - Have a MySQL database setup
 - Set the correct properties for your database in the mysql.createConnection()
-- Have a table in the database you're using called "path" with field "latest"
+- Have a table in the database you're using called "path" with field "latest" (VARCHAR)
 - Have some record in the "path" table
 
 The last two bullet points are necessary because this file is assuming that some version of the manifest is/was stored in the database previously, and path.latest stores the URL path from the "jsonWorldContentsPath" request when the database was last updated. If you want to force the database to update, just run a MySQL UPDATE to change the value in path.latest to some random string.
