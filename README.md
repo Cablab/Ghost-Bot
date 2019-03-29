@@ -9,7 +9,7 @@ However, there now also exists a "jsonWorldContentPaths" object that will give y
 My manifest.js file uses this second method, grabs the english JSON manifest object, runs it through JSON.stringify(), runs it through a method that escapes certain characters, then puts the data into a MySQL database. The database has a table for each top-level Definition in the manifest, and each table has records relating the hash value of an entity to its entire JSON object value.
 
 To use this file the way I have it set up, you **MUST**:
-- Have a local MySQL database setup
+- Have a MySQL database setup
 - Set the correct properties for your database in the mysql.createConnection()
 - Have a table in the database you're using called "path" with field "latest"
 - Have some record in the "path" table
